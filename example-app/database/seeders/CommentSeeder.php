@@ -15,9 +15,20 @@ class CommentSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('comments')->insert([
-            'content' => Str::random(50),
-        ]);
+        // DB::table('comments')->insert([
+        //     'content' => Str::random(50),
+        // ]);
+        // for ($i = 0; $i < 10; $i++) {
+            $user = User::find(1);
+            $post = Post::find(1);
+
+            Comment::create([
+                'content' => fake()->name(),
+            ]);
+            $user->comments()->save($comment);
+            $post->comments()->save($comment);
+
+        // }
 
         Comment::factory()
         ->count(10)

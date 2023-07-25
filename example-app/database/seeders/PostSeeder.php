@@ -15,14 +15,21 @@ class PostSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('posts')->insert([
-            'title' => Str::random(10),
-            'content' => Str::random(50),
-        ]);
+        // DB::table('posts')->insert([
+        //     'title' => Str::random(10),
+        //     'content' => Str::random(50),
+        // ]);
 
-        Post::factory()
-        ->count(10)
-        ->hasComments(1)
-        ->create();
+        // for ($i = 0; $i < 10; $i++) {
+            Post::create([
+                'title' => fake()->sentence(),
+                'content' => fake()->paragraph(),
+                'user_id'=>1,
+            ]);
+        // }
+        // Post::factory()
+        // ->count(10)
+        // ->hasComments(1)
+        // ->create();
     }
 }
