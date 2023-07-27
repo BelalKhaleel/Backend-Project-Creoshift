@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -10,9 +11,10 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    //Create User
     public function store(Request $request) {
 
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:8',
@@ -27,65 +29,39 @@ class UserController extends Controller
         return response(['success' => true, 'data' => $user]);
     }
 
-    public function show(Request $request, $id) {
+    //Get all users
+    public function index(user $user) {
+       $users = User::all();
+       return response(['success' => true, 'data' => $users]);
+    }
 
-        $request->validate([
-            'id' => $id], ['id' => 'required|numeric',
-        ]);
-     
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json([
-                'error' => 'User not found!',
-            ], 404);
-        }
-
+    //Get user
+    public function show(user $user) {
         return response(['success' => true, 'data' => $user]);
     }
 
-    public function edit(Request $request, $id) {
+    //Update user credentials
+    public function update(Request $request, user $user) {
 
-        $request->validate([
-            'id' => $id], ['id' => 'required|numeric',
-        ]);
-
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json([
-                'error' => 'User not found!',
-            ], 404);
-        }
-
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:8',
         ]);
 
+        if (request()->has('password'))
+            $data['password'] = bcrypt($data['password']);
+
         $inputs = $request->except('_method');
-        $user->update($inputs);
+        $user->update($data);
 
         return response(['success' => true, 'data' => $user]);
     }
 
-    public function destroy(Request $request, $id) {
-
-        $request->validate([
-            'id' => $id], ['id' => 'required|numeric',
-        ]);
-
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json([
-                'error' => 'User not found!',
-            ], 404);
-        }
-
+    //Delete user
+    public function destroy(user $user)
+    {
         $user->delete();
-
-        return response(['success' => true, 'data' => $user]);
-    } 
+        return response(['data' => $user], Response::HTTP_NO_CONTENT);
+    }
 }
