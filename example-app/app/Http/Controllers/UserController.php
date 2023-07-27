@@ -10,46 +10,45 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function addUser(Request $request) {
+    public function store(Request $request) {
 
-        $rules = [
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:8',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => $validator->errors(),
-            ], 400);
-        }
-
-        $user = new User;
-        $name = $request->input('name');
-        $email = $request->input('email');
-        $password = $request->input('password');
-        $user->name = $name;
-        $user->email = $email;
-        $user->password = Hash::make($password);
-        $user->save();
-
-        return response()->json([
-            'message' => 'User created successfully!',
-            'user' => $user,
         ]);
+
+        $user = User::create([
+            'name' => $name,
+            'email' => $email,
+            'password' => Hash::make($password),
+        ]);
+
+        return response(['success' => true, 'data' => $user]);
     }
 
-    public function getUser(Request $request, $id) {
+    public function show(Request $request, $id) {
 
-        $validator = Validator::make(['id' => $id], ['id' => 'required|numeric',]);
+        $request->validate([
+            'id' => $id], ['id' => 'required|numeric',
+        ]);
+     
+        $user = User::find($id);
 
-        if ($validator->fails()) {
+        if (!$user) {
             return response()->json([
-                'error' => 'Invalid user ID format',
-            ], 400);
+                'error' => 'User not found!',
+            ], 404);
         }
+
+        return response(['success' => true, 'data' => $user]);
+    }
+
+    public function edit(Request $request, $id) {
+
+        $request->validate([
+            'id' => $id], ['id' => 'required|numeric',
+        ]);
 
         $user = User::find($id);
 
@@ -59,62 +58,23 @@ class UserController extends Controller
             ], 404);
         }
 
-        return response()->json([
-            'message' => 'Retrieved user successfully!',
-            'user' => $user,
-        ]);
-    }
-
-    public function editUser(Request $request, $id) {
-
-        $validator = Validator::make(['id' => $id], ['id' => 'required|numeric',]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => 'Invalid user ID format',
-            ], 400);
-        }
-
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json([
-                'error' => 'User not found!',
-            ], 404);
-        }
-
-        $rules = [
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:8',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => $validator->errors(),
-            ], 400);
-        }
+        ]);
 
         $inputs = $request->except('_method');
         $user->update($inputs);
 
-        return response()->json([
-            'message' => 'Edited user successfully!',
-            'user' => $user,
-        ]);
+        return response(['success' => true, 'data' => $user]);
     }
 
-    public function deleteUser(Request $request, $id) {
+    public function destroy(Request $request, $id) {
 
-        $validator = Validator::make(['id' => $id], ['id' => 'required|numeric',]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => 'Invalid user ID format',
-            ], 400);
-        }
+        $request->validate([
+            'id' => $id], ['id' => 'required|numeric',
+        ]);
 
         $user = User::find($id);
 
@@ -126,9 +86,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return response()->json([
-            'message' => 'Deleted user successfully!',
-            'user' => $user,
-        ]);
-    }
+        return response(['success' => true, 'data' => $user]);
+    } 
 }
