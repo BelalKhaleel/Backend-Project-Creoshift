@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
@@ -22,12 +26,12 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'content' => 'required|content,string|max:255',
+            'content' => 'required|string|max:255',
+            'user_id' => 'required|exists:users,id',
+            'post_id' => 'required|exists:posts,id',
         ]);
 
-        $comment = Comment::create([
-            'content' => $content,
-        ]);
+        $comment = Comment::create($data);
 
         return response(['success' => true, 'data' => $comment]);
     }
@@ -46,10 +50,10 @@ class CommentController extends Controller
     public function update(Request $request, Comment $comment)
     {
         $data = $request->validate([
-            'content' => 'required|content,string|max:255',
+            'content' => 'required|string|max:255',
         ]);
 
-        $comment = update($data);
+        $comment->update($data);
 
         return response(['success' => true, 'data' => $comment]);
     }

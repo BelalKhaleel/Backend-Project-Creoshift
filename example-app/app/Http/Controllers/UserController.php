@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Response;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -25,11 +25,9 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        $user = User::create([
-            'name' => $name,
-            'email' => $email,
-            'password' => bcrypt($password),
-        ]);
+        $data['password'] = bcrypt($data['password']);
+
+        $user = User::create($data);
 
         return response(['success' => true, 'data' => $user]);
     }
@@ -43,9 +41,9 @@ class UserController extends Controller
     public function update(Request $request, user $user) {
 
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|min:8',
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $user->id . '|max:255',
+            'password' => 'sometimes|string|min:8',
         ]);
 
         if (request()->has('password'))

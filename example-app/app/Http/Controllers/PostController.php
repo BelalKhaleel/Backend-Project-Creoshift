@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -23,13 +26,11 @@ class PostController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|content,string|max:255',
+            'content' => 'required|string|max:255',
+            'user_id' => 'required|exists:users,id',
         ]);
 
-        $post = Post::create([
-            'title' => $title,
-            'content' => $content,
-        ]);
+        $post = Post::create($data);
 
         return response(['success' => true, 'data' => $post]);
     }
@@ -48,11 +49,11 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|content,string|max:255',
+            'title' => 'sometimes|string|max:255',
+            'content' => 'sometimes|string|max:255',
         ]);
 
-        $post = update($data);
+        $post->update($data);
 
         return response(['success' => true, 'data' => $post]);
     }
