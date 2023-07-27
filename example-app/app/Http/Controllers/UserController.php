@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    //Get all users
+    public function index(user $user) {
+       $users = User::all();
+       return response(['success' => true, 'data' => $users]);
+    }
+
     //Create User
     public function store(Request $request) {
 
@@ -23,16 +28,10 @@ class UserController extends Controller
         $user = User::create([
             'name' => $name,
             'email' => $email,
-            'password' => Hash::make($password),
+            'password' => bcrypt($password),
         ]);
 
         return response(['success' => true, 'data' => $user]);
-    }
-
-    //Get all users
-    public function index(user $user) {
-       $users = User::all();
-       return response(['success' => true, 'data' => $users]);
     }
 
     //Get user
@@ -52,7 +51,6 @@ class UserController extends Controller
         if (request()->has('password'))
             $data['password'] = bcrypt($data['password']);
 
-        $inputs = $request->except('_method');
         $user->update($data);
 
         return response(['success' => true, 'data' => $user]);
