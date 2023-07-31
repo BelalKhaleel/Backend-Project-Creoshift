@@ -22,6 +22,10 @@ class PostController extends Controller
             ->allowedFilters(['title', 'content', 'user_id'])
             ->get();
 
+        $posts = QueryBuilder::for(Post::class)
+            ->allowedSorts(['title', 'content', 'user_id'])
+            ->get();
+
        return response(['success' => true, 'data' => $posts]);
     }
 

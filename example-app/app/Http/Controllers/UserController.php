@@ -19,6 +19,10 @@ class UserController extends Controller
             ->allowedFilters(['name', 'email'])
             ->get();
 
+        $users = QueryBuilder::for(User::class)
+            ->allowedSorts(['name', 'email'])
+            ->get();
+
         return response(['success' => true, 'data' => $users]);
     }
 

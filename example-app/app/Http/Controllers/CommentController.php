@@ -23,6 +23,10 @@ class CommentController extends Controller
             ->allowedFilters(['content', 'user_id', 'post_id'])
             ->get();
 
+        $comments = QueryBuilder::for(Comment::class)
+            ->allowedSorts(['content', 'user_id', 'post_id'])
+            ->get();
+
         return response(['success' => true, 'data' => $comments]);
     }
 
