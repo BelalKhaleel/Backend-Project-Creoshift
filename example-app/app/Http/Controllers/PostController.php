@@ -16,15 +16,10 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::paginate(5);
-
         $posts = QueryBuilder::for(Post::class)
-            ->allowedFilters(['title', 'content', 'user_id'])
-            ->get();
-
-        $posts = QueryBuilder::for(Post::class)
+            ->allowedFilters(['title', 'content', 'user_id', AllowedFilter::exact('id')])
             ->allowedSorts(['title', 'content', 'user_id'])
-            ->get();
+            ->paginate(5);
 
        return response(['success' => true, 'data' => $posts]);
     }

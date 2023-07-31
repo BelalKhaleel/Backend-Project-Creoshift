@@ -13,15 +13,11 @@ class UserController extends Controller
 {
     //Get all users
     public function index(user $user) {
-        $users = User::paginate(5);
 
         $users = QueryBuilder::for(User::class)
-            ->allowedFilters(['name', 'email'])
-            ->get();
-
-        $users = QueryBuilder::for(User::class)
+            ->allowedFilters(['name', 'email', AllowedFilter::exact('id')])
             ->allowedSorts(['name', 'email'])
-            ->get();
+            ->paginate(5);
 
         return response(['success' => true, 'data' => $users]);
     }

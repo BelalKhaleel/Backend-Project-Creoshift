@@ -17,15 +17,10 @@ class CommentController extends Controller
      */
     public function index()
     {
-        $comments = Comment::paginate(5);
-
         $comments = QueryBuilder::for(Comment::class)
-            ->allowedFilters(['content', 'user_id', 'post_id'])
-            ->get();
-
-        $comments = QueryBuilder::for(Comment::class)
+            ->allowedFilters(['content', 'user_id', 'post_id', AllowedFilter::exact('id')])
             ->allowedSorts(['content', 'user_id', 'post_id'])
-            ->get();
+            ->paginate(5);
 
         return response(['success' => true, 'data' => $comments]);
     }
