@@ -7,12 +7,18 @@ use Illuminate\Http\Response;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class UserController extends Controller
 {
     //Get all users
     public function index(user $user) {
         $users = User::paginate(5);
+
+        $users = QueryBuilder::for(User::class)
+            ->allowedFilters(['name', 'email'])
+            ->get();
+
         return response(['success' => true, 'data' => $users]);
     }
 

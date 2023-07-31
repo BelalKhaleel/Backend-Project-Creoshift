@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class CommentController extends Controller
 {
@@ -17,6 +18,11 @@ class CommentController extends Controller
     public function index()
     {
         $comments = Comment::paginate(5);
+
+        $comments = QueryBuilder::for(Comment::class)
+            ->allowedFilters(['content', 'user_id', 'post_id'])
+            ->get();
+
         return response(['success' => true, 'data' => $comments]);
     }
 
