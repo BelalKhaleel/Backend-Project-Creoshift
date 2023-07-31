@@ -12,8 +12,8 @@ class UserController extends Controller
 {
     //Get all users
     public function index(user $user) {
-       $users = User::all();
-       return response(['success' => true, 'data' => $users]);
+        $users = User::paginate(5);
+        return response(['success' => true, 'data' => $users]);
     }
 
     //Create User
