@@ -11,11 +11,7 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title',
-        'content',
-        'user_id'
-    ];
+    protected $guarded = [];
 
     /**
      * Get the comments for the blog post.

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -69,4 +70,6 @@ class CommentController extends Controller
         $comment->delete();
         return response(['data' => $comment], Response::HTTP_NO_CONTENT);
     }
+
+    use SoftDeletes;
 }
