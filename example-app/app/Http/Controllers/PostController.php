@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class PostController extends Controller
 {
@@ -16,10 +15,10 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = QueryBuilder::for(Post::class)
+        $posts = QueryBuilder::for(Post::class)->with(['comments'])
             ->allowedFilters(['title', 'content', 'user_id', AllowedFilter::exact('id')])
             ->allowedSorts(['title', 'content', 'user_id'])
-            ->paginate(5);
+            ->paginate(100);
 
        return response(['success' => true, 'data' => $posts]);
     }
@@ -45,7 +44,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return response(['success' => true, 'data' => $post]);
+        return response(['success' => true, 'data' => $post->load('comments')]);
     }
 
     /**

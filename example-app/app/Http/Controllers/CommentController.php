@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
-use App\Models\Post;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class CommentController extends Controller
 {
@@ -20,7 +18,7 @@ class CommentController extends Controller
         $comments = QueryBuilder::for(Comment::class)
             ->allowedFilters(['content', 'user_id', 'post_id', AllowedFilter::exact('id')])
             ->allowedSorts(['content', 'user_id', 'post_id'])
-            ->paginate(5);
+            ->paginate(100);
 
         return response(['success' => true, 'data' => $comments]);
     }

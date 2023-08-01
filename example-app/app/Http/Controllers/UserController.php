@@ -5,19 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class UserController extends Controller
 {
     //Get all users
-    public function index(user $user) {
+    public function index() {
 
-        $users = QueryBuilder::for(User::class)
+        $users = QueryBuilder::for(User::class)->with(['posts', 'comments'])
             ->allowedFilters(['name', 'email', AllowedFilter::exact('id')])
             ->allowedSorts(['name', 'email'])
-            ->paginate(5);
+            ->paginate(100);
 
         return response(['success' => true, 'data' => $users]);
     }
@@ -40,7 +39,7 @@ class UserController extends Controller
 
     //Get user
     public function show(user $user) {
-        return response(['success' => true, 'data' => $user]);
+        return response(['success' => true, 'data' => $user->load(['posts', 'comments'])]);
     }
 
     //Update user credentials
