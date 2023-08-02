@@ -13,10 +13,6 @@ class PostSeeder extends Seeder
      */
     public function run(): void
     {
-        Post::create([
-            'title' => fake()->sentence(),
-            'content' => fake()->paragraph(),
-            'user_id'=>1,
-        ]);
+        Post::factory(10)->withUser()->create();
     }
 }
