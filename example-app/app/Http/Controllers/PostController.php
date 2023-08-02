@@ -13,12 +13,14 @@ class PostController extends Controller
     /**
      * Display a listing of the posts.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = QueryBuilder::for(Post::class)->with(['comments'])
+        $posts = QueryBuilder::for(Post::class)
+            ->with(['comments'])
             ->allowedFilters(['title', 'content', 'user_id', AllowedFilter::exact('id')])
             ->allowedSorts(['title', 'content', 'user_id'])
-            ->paginate(100);
+            ->paginate($request->input('per_page', 100))
+            ->appends($request->query());
 
        return response(['success' => true, 'data' => $posts]);
     }
@@ -53,8 +55,8 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $data = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'content' => 'sometimes|string|max:255',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string|max:255',
         ]);
 
         $post->update($data);

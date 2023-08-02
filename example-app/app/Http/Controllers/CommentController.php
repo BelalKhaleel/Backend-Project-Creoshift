@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -14,12 +14,13 @@ class CommentController extends Controller
     /**
      * Display a listing of the comments.
      */
-    public function index()
+    public function index(Request $request)
     {
         $comments = QueryBuilder::for(Comment::class)
             ->allowedFilters(['content', 'user_id', 'post_id', AllowedFilter::exact('id')])
             ->allowedSorts(['content', 'user_id', 'post_id'])
-            ->paginate(100);
+            ->paginate($request->input('per_page', 100))
+            ->appends($request->query());
 
         return response(['success' => true, 'data' => $comments]);
     }
@@ -70,6 +71,4 @@ class CommentController extends Controller
         $comment->delete();
         return response(['data' => $comment], Response::HTTP_NO_CONTENT);
     }
-
-    use SoftDeletes;
 }

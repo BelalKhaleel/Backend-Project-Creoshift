@@ -11,12 +11,15 @@ use Spatie\QueryBuilder\AllowedFilter;
 class UserController extends Controller
 {
     //Get all users
-    public function index() {
+    public function index(Request $request) {
 
-        $users = QueryBuilder::for(User::class)->with(['posts', 'comments'])
+        $users = QueryBuilder::for(User::class)
+            ->with(['posts', 'comments'])
             ->allowedFilters(['name', 'email', AllowedFilter::exact('id')])
-            ->allowedSorts(['name', 'email'])
-            ->paginate(100);
+            ->defaultSort('-updated_at')
+            ->allowedSorts(['name', 'email', '-updated_at'])
+            ->paginate($request->input('per_page', 100))
+            ->appends($request->query());
 
         return response(['success' => true, 'data' => $users]);
     }
@@ -46,9 +49,9 @@ class UserController extends Controller
     public function update(Request $request, user $user) {
 
         $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $user->id . '|max:255',
-            'password' => 'sometimes|string|min:8',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id . '|max:255',
+            'password' => 'required|string|min:8',
         ]);
 
         if (request()->has('password'))
