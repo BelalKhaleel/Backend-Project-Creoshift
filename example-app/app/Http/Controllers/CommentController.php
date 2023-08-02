@@ -46,6 +46,9 @@ class CommentController extends Controller
      */
     public function show(Comment $comment)
     {
+        if ($comment->trashed()) {
+            return response(['success' => false, 'message' => 'This comment has been soft deleted.']);
+        }
         return response(['success' => true, 'data' => $comment]);
     }
 
@@ -54,6 +57,10 @@ class CommentController extends Controller
      */
     public function update(Request $request, Comment $comment)
     {
+        if ($comment->trashed()) {
+            return response(['success' => false, 'message' => 'Cannot update a soft-deleted comment.']);
+        }
+
         $data = $request->validate([
             'content' => 'required|string|max:255',
         ]);
@@ -68,6 +75,9 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
+        if ($comment->trashed()) {
+            return response(['success' => false, 'message' => 'This comment has already been soft deleted.']);
+        }
         $comment->delete();
         return response(['data' => $comment], Response::HTTP_NO_CONTENT);
     }
