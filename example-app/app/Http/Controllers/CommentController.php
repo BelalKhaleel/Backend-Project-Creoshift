@@ -18,7 +18,8 @@ class CommentController extends Controller
     {
         $comments = QueryBuilder::for(Comment::class)
             ->allowedFilters(['content', 'user_id', 'post_id', AllowedFilter::exact('id')])
-            ->allowedSorts(['content', 'user_id', 'post_id'])
+            ->defaultSort('-updated_at')
+            ->allowedSorts(['content', 'user_id', 'post_id', '-updated_at'])
             ->paginate($request->input('per_page', 100))
             ->appends($request->query());
 

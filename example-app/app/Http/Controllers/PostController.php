@@ -18,7 +18,8 @@ class PostController extends Controller
         $posts = QueryBuilder::for(Post::class)
             ->with(['comments'])
             ->allowedFilters(['title', 'content', 'user_id', AllowedFilter::exact('id')])
-            ->allowedSorts(['title', 'content', 'user_id'])
+            ->defaultSort('-updated_at')
+            ->allowedSorts(['title', 'content', 'user_id', '-updated_at'])
             ->paginate($request->input('per_page', 100))
             ->appends($request->query());
 
