@@ -7,6 +7,8 @@ use Illuminate\Http\Response;
 use App\Models\User;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -31,11 +33,16 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:8',
+            'role' => 'nullable|string',
         ]);
 
         $data['password'] = bcrypt($data['password']);
 
+        $role = empty($data['role']) ? 'visitor' : $data['role'];
+
         $user = User::create($data);
+
+        $user->assignRole($role);
 
         return response(['success' => true, 'data' => $user]);
     }
@@ -52,12 +59,17 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id . '|max:255',
             'password' => 'required|string|min:8',
+            'role' => 'nullable|string',
         ]);
 
         if (request()->has('password'))
             $data['password'] = bcrypt($data['password']);
 
+            $role = empty($data['role']) ? 'visitor' : $data['role'];
+
         $user->update($data);
+
+        $user->assignRole($role);
 
         return response(['success' => true, 'data' => $user]);
     }
