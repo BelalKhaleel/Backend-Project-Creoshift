@@ -7,8 +7,8 @@ use Illuminate\Http\Response;
 use App\Models\User;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -44,7 +44,37 @@ class UserController extends Controller
 
         $user->assignRole($role);
 
-        return response(['success' => true, 'data' => $user]);
+        return response([
+            'success' => true, 
+            'data' => $user,
+            'token' => $user->createToken("API TOKEN")->plainTextToken
+        ]);
+    }
+
+    //Login the User
+    public function loginUser(Request $request) {
+
+        $data = $request->validate([
+            'email' => 'required|email|unique:users,email|max:255',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $data['password'] = bcrypt($data['password']);
+
+        if(!Auth::attempt($request->only(['email', 'password']))) {
+            return response([
+                'success' => false,
+                'message' => 'The provided credentials do not match our records.',
+            ]);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        return response([
+            'success' => true,
+            'message' => 'User logged in successfully',
+            'data' => $user,
+        ]);
     }
 
     //Get user

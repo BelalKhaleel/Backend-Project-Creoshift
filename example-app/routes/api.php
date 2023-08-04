@@ -21,11 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/tokens/create', function (Request $request) {
-    $token = $request->user()->createToken($request->token_name);
- 
-    return ['token' => $token->plainTextToken];
-});
+Route::post('/auth/register', [UserController::class, 'store']);
+Route::post('/auth/login', [UserController::class, 'loginUser']);
 
 Route::apiResource('users', UserController::class);
 Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
