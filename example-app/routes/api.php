@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\SessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/auth/register', [UserController::class, 'store']);
-Route::post('/auth/login', [UserController::class, 'loginUser']);
+// Route::post('/auth/register', [UserController::class, 'store']);
+Route::post('/auth/login', [SessionController::class, 'loginUser']);
+Route::get('/auth/logout', [SessionController::class, 'logout']);
 
 Route::apiResource('users', UserController::class);
 Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');

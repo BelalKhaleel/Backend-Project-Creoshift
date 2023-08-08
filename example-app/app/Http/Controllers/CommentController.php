@@ -46,9 +46,6 @@ class CommentController extends Controller
      */
     public function show(Comment $comment)
     {
-        if ($comment->trashed()) {
-            return response(['success' => false, 'message' => 'This comment has been soft deleted.']);
-        }
         return response(['success' => true, 'data' => $comment]);
     }
 
