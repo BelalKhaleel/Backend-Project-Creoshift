@@ -26,6 +26,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/auth/login', [SessionController::class, 'loginUser']);
 Route::post('/auth/logout', [SessionController::class, 'logout'])->middleware('auth:sanctum');
 
+Route::get('users/export/', [UserController::class, 'export']);
+
 Route::apiResource('users', UserController::class);
 Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
 Route::apiResource('comments', CommentController::class);
