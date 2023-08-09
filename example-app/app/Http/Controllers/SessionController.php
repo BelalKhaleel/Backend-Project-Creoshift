@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Models\User;
 
 class SessionController extends Controller
@@ -15,26 +16,6 @@ class SessionController extends Controller
      /**
      * Handle an authentication attempt.
      */
-    // public function login(Request $request): RedirectResponse
-    // {
-    //     $credentials = $request->validate([
-    //         'email' => ['required', 'email'],
-    //         'password' => ['required'],
-    //     ]);
-
-    //     if (Auth::attempt($credentials)) {
-    //         $request->session()->regenerate();
-    //         $user = Auth::user();
-    //         $token = $user->createToken("API TOKEN")->plainTextToken;
-    //         $request->session()->put('api_token', $token);
-
-    //         return redirect()->intended('dashboard');
-    //     }
-
-    //     return back()->withErrors([
-    //         'email' => 'The provided credentials do not match our records.',
-    //     ])->onlyInput('email');
-    // }
 
     // Login the User
      public function loginUser(Request $request) {
@@ -67,8 +48,8 @@ class SessionController extends Controller
     */
     public function logout(Request $request)
 {
-    $user = auth()->user();
     $request->user()->tokens()->delete();
-    return response(['Logged out!', 'data' => $user, Response::HTTP_FORBIDDEN]);
+
+    return response('Logged out!', ResponseAlias::HTTP_FORBIDDEN);
 }
 }
