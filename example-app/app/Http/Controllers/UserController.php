@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
 
 class UserController extends Controller
 {
@@ -86,8 +87,24 @@ class UserController extends Controller
         return response(['data' => $user], Response::HTTP_NO_CONTENT);
     }
 
+    //Export user collection
     public function export() 
     {
         return Excel::download(new UsersExport, 'users.xlsx');
+    }
+
+    //Import user collection
+    public function import(Request $request) 
+    {
+        // $this->validate($request, [
+        //     'select_file' => 'required|mimes:xls,xlsx'
+        // ]); 
+
+        // $path = $request->file('select_file')->getRealPath();
+
+        Excel::import(new UsersImport, request()->file('file'));
+        // $data = Excel::load->($path)->get();
+        
+        return response(['success' => true, 'message' => 'File imported successfully!']);
     }
 }
