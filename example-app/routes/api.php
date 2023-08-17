@@ -22,13 +22,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Route::post('/auth/register', [UserController::class, 'store']);
-Route::post('/auth/login', [SessionController::class, 'loginUser']);
-Route::post('/auth/logout', [SessionController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/auth/login', [SessionController::class, 'store']);
+Route::post('/auth/logout', [SessionController::class, 'destroy'])->middleware('auth:sanctum');
 
-Route::get('users/export/', [UserController::class, 'export']);
-Route::post('users/import/', [UserController::class, 'import']);
-
-Route::apiResource('users', UserController::class);
-Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
-Route::apiResource('comments', CommentController::class);
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    
+    Route::get('users/export', [UserController::class, 'exportUsers']);
+    Route::post('users/import', [UserController::class, 'importUsers']);
+    
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('posts', PostController::class);
+    Route::apiResource('comments', CommentController::class);
+});

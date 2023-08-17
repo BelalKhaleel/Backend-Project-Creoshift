@@ -18,7 +18,7 @@ class SessionController extends Controller
      */
 
     // Login the User
-     public function loginUser(Request $request) {
+     public function store(Request $request) {
 
         $data = $request->validate([
             'email' => 'required|email',
@@ -46,7 +46,7 @@ class SessionController extends Controller
     /**
     * Log the user out of the application.
     */
-    public function logout(Request $request)
+    public function destroy(Request $request)
 {
     $request->user()->tokens()->delete();
 
