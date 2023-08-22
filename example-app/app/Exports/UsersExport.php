@@ -3,7 +3,6 @@
 namespace App\Exports;
 
 use Carbon\Carbon;
-use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -14,20 +13,25 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class UsersExport implements FromQuery, WithMapping, WithHeadings, ShouldAutoSize
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    // public function collection()
-    // {
-    //     return User::all();
-    // }
-
     use Exportable;
-    
+
     public function query()
     {
-        $users = User::query()->with(['post', 'comment']);
+        $users = User::query()->with(['posts', 'comments']);
         return $users;
+    }
+
+    public function headings(): array
+    {
+        return
+        [
+         "id",
+         "name",
+         "email",
+         "post title",
+         "post",
+         "comment",
+        ];
     }
 
     public function map($user): array
@@ -36,32 +40,11 @@ class UsersExport implements FromQuery, WithMapping, WithHeadings, ShouldAutoSiz
             $user->id,
             $user->name,
             $user->email,
-            $user->email_verified_at ? $user->email_verified_at->format('Y-m-d') : "NULL",
-            $user->created_at->format('Y-m-d'),
-            $user->updated_at->format('Y-m-d'),
-            $user->posts->id,
-            $user->posts->title,
-            $user->posts->content,
-            $user->comments->id,
-            $user->comments->content,
+            $user->posts->pluck('title')->implode(', '),
+            $user->posts->pluck('content')->implode(', '),
+            $user->comments->pluck('content')->implode(', '),
         ];
     }
 
-    public function headings(): array
-    {
-        return 
-        [
-         "id",
-         "name",
-         "email", 
-         "email_verified_at", 
-         "created_at", 
-         "updated_at",
-         "post_id",
-         "post_title",
-         "post_content",
-         "comment_id",
-         "comment_content",
-        ];
-    }
+
 }

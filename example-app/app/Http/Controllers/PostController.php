@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Exports\PostsExport;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -72,5 +74,9 @@ class PostController extends Controller
     {
         $post->delete();
         return response(['data' => $post], Response::HTTP_NO_CONTENT);
+    }
+
+    public function exportPosts() {
+        return (new PostsExport)->download('posts.xlsx');
     }
 }
