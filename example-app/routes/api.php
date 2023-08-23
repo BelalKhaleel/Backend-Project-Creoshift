@@ -31,6 +31,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('users/import', [UserController::class, 'importUsers']);
 
     Route::get('posts/export/', [PostController::class, 'exportPosts']);
+    Route::post('posts/import/', [PostController::class, 'importPosts']);
     
     Route::apiResource('users', UserController::class);
     Route::apiResource('posts', PostController::class);
