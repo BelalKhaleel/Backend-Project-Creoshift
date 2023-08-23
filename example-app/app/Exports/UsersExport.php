@@ -2,9 +2,9 @@
 
 namespace App\Exports;
 
-use Carbon\Carbon;
 use App\Models\User;
-use App\Models\Comment;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -17,21 +17,24 @@ class UsersExport implements FromQuery, WithMapping, WithHeadings, ShouldAutoSiz
 
     public function query()
     {
-        $users = User::query()->with(['posts', 'comments']);
+        $users = QueryBuilder::for(User::class)
+            ->with(['posts', 'comments'])
+            ->allowedFilters(['name', 'email', AllowedFilter::exact('id')]);
+
         return $users;
     }
 
     public function headings(): array
     {
         return
-        [
-         "id",
-         "name",
-         "email",
-         "post title",
-         "post",
-         "comment",
-        ];
+            [
+                "id",
+                "name",
+                "email",
+                "post title",
+                "post",
+                "comment",
+            ];
     }
 
     public function map($user): array
@@ -45,6 +48,4 @@ class UsersExport implements FromQuery, WithMapping, WithHeadings, ShouldAutoSiz
             $user->comments->pluck('content')->implode(', '),
         ];
     }
-
-
 }

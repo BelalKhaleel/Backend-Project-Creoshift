@@ -3,6 +3,8 @@
 namespace App\Exports;
 
 use App\Models\Post;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -12,14 +14,15 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class PostsExport implements FromQuery, ShouldAutoSize, WithMapping, WithHeadings
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
     use Exportable;
 
     public function query()
     {
-        return Post::query()->with(['user', 'comments']);
+        $posts = QueryBuilder::for(Post::class)
+            ->with(['user', 'comments'])
+            ->allowedFilters(['title', 'content', 'user_id', AllowedFilter::exact('id')]);
+
+        return $posts;
     }
 
     public function map($post): array
@@ -34,7 +37,7 @@ class PostsExport implements FromQuery, ShouldAutoSize, WithMapping, WithHeading
         ];
     }
 
-    public function headings(): array 
+    public function headings(): array
     {
         return [
             "id",
