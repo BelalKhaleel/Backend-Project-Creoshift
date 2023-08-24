@@ -8,6 +8,7 @@ use App\Imports\PostsImport;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Cache;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -18,15 +19,20 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $posts = QueryBuilder::for(Post::class)
-            ->with(['comments'])
-            ->allowedFilters(['title', 'content', 'user_id', AllowedFilter::exact('id')])
-            ->defaultSort('-updated_at')
-            ->allowedSorts(['title', 'content', 'user_id', '-updated_at'])
-            ->paginate($request->input('per_page', 100))
-            ->appends($request->query());
+        $cacheKey = 'posts';
+        $seconds = 60;
 
-       return response(['success' => true, 'data' => $posts]);
+        $posts = Cache::remember($cacheKey, $seconds, function () use ($request) {
+            return QueryBuilder::for(Post::class)
+                ->with(['comments'])
+                ->allowedFilters(['title', 'content', 'user_id', AllowedFilter::exact('id')])
+                ->defaultSort('-updated_at')
+                ->allowedSorts(['title', 'content', 'user_id', '-updated_at'])
+                ->paginate($request->input('per_page', 100))
+                ->appends($request->query());
+        });
+
+        return response(['success' => true, 'data' => $posts]);
     }
 
     /**
@@ -77,14 +83,21 @@ class PostController extends Controller
         return response(['data' => $post], Response::HTTP_NO_CONTENT);
     }
 
-    public function exportPosts() {
+    /**
+     * Export posts into an excel sheet.
+     */
+    public function exportPosts()
+    {
         return (new PostsExport)->download('posts.xlsx');
     }
 
-    public function importPosts() 
+    /**
+     * Import uploaded excel sheet into the database.
+     */
+    public function importPosts()
     {
         Excel::import(new PostsImport, request()->file('file'));
-        
+
         return redirect('/')->with('success', 'All good!');
     }
 }

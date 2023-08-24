@@ -16,13 +16,6 @@ class PostsImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
-        // $user = User::find($row['user_id']);
-
-        // if (!$user) {
-        //     // Handle the case where the user does not exist
-        //     // For example, you might want to skip this row
-        //     return null;
-        // }
         return new Post([
             'user_id'       => $row['user_id'],
             'title'    => $row['title'],
