@@ -7,6 +7,7 @@ use App\Exports\PostsExport;
 use App\Imports\PostsImport;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Cache;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -20,8 +21,9 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $cacheKey = 'posts';
-        $seconds = 60;
+        $seconds = 10;
 
+        Log::info('Fetching data from the database with cache expiration of ' . $seconds . ' seconds');
         $posts = Cache::remember($cacheKey, $seconds, function () use ($request) {
             return QueryBuilder::for(Post::class)
                 ->with(['comments'])
@@ -32,6 +34,11 @@ class PostController extends Controller
                 ->appends($request->query());
         });
 
+        if (Cache::has($cacheKey)) {
+            Log::info('Data fetched from cache');
+        } else {
+            Log::info('Data generated and cached');
+        }
         return response(['success' => true, 'data' => $posts]);
     }
 
@@ -94,10 +101,12 @@ class PostController extends Controller
     /**
      * Import uploaded excel sheet into the database.
      */
-    public function importPosts()
+    public function importPosts(Request $request)
     {
-        Excel::import(new PostsImport, request()->file('file'));
+        $file = $request->file('file');
 
-        return redirect('/')->with('success', 'All good!');
+        Excel::import(new PostsImport, $file, null, \Maatwebsite\Excel\Excel::XLSX);
+
+    return redirect('/')->with('success', 'File imported successfully!');
     }
 }
